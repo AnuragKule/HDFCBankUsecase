@@ -5,7 +5,7 @@ import json
 import os
 
 app = FastAPI()
-DATA_FILE = "API/hdfc_transactions_with_phone.json"
+DATA_FILE = "transaction.py"
 
 # ----- Pydantic model -----
 class TransactionIn(BaseModel):
