@@ -5,9 +5,11 @@ import json
 import os
 
 app = FastAPI()
-DATA_FILE = "transactions.json"
 
-# ----- Pydantic model -----
+# ✅ Use this file instead of transactions.json
+DATA_FILE = "hdfc_transactions_with_phone.json"
+
+# ----- Pydantic Models -----
 class TransactionIn(BaseModel):
     Account_Number: str
     Transaction_Date: str
@@ -26,7 +28,7 @@ class TransactionOut(TransactionIn):
     Transaction_ID: str
     Customer_ID: str
 
-# ----- File Helpers -----
+# ----- Helper Functions -----
 def load_data():
     if not os.path.exists(DATA_FILE):
         return []
@@ -37,22 +39,29 @@ def save_data(data):
     with open(DATA_FILE, "w") as f:
         json.dump(data, f, indent=2)
 
-# ----- ID Generators -----
 def generate_transaction_id(data):
     last_id = 0
     for item in data:
-        num = int(item["Transaction_ID"].replace("TXN", ""))
-        last_id = max(last_id, num)
+        try:
+            num = int(item["Transaction_ID"].replace("TXN", ""))
+            last_id = max(last_id, num)
+        except:
+            continue
     return f"TXN{last_id + 1:05d}"
 
 def generate_customer_id(data):
     last_id = 1000
     for item in data:
-        num = int(item["Customer_ID"].replace("CUST", ""))
-        last_id = max(last_id, num)
+        try:
+            num = int(item["Customer_ID"].replace("CUST", ""))
+            last_id = max(last_id, num)
+        except:
+            continue
     return f"CUST{last_id + 1}"
 
-# ----- Add Transaction -----
+# ----- API Routes -----
+
+# ✅ Add a new transaction
 @app.post("/add_transaction", response_model=TransactionOut)
 def add_transaction(tx: TransactionIn):
     data = load_data()
@@ -68,35 +77,65 @@ def add_transaction(tx: TransactionIn):
 
     return tx_data
 
-# ----- Get Transactions by Phone -----
+# ✅ Get all transactions by phone number
 @app.get("/transactions/{phone_number}", response_model=List[TransactionOut])
 def get_transactions(phone_number: str):
-    data = load_data()
-    txns = [t for t in data if t["Phone_Number"] == phone_number]
-    if not txns:
-        raise HTTPException(status_code=404, detail="No transactions found.")
-    return txns
+    try:
+        data = load_data()
+        print("Loaded data count:", len(data))
+        print("Searching for phone number:", phone_number)
 
-# ----- Update Transaction -----
+        # Print keys from first record to validate
+        if data:
+            print("Available keys:", list(data[0].keys()))
+
+        txns = [t for t in data if t.get("Phone_Number") == phone_number]
+
+        print("Found transactions:", len(txns))
+        if not txns:
+            raise HTTPException(status_code=404, detail="No transactions found.")
+
+        return txns
+
+    except Exception as e:
+        print("❌ Internal Error:", str(e))
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+# ✅ Update a specific transaction
 @app.put("/update_transaction/{phone_number}/{txn_id}", response_model=TransactionOut)
 def update_transaction(phone_number: str, txn_id: str, tx: TransactionIn):
     data = load_data()
+
     for i, item in enumerate(data):
-        if item["Phone_Number"] == phone_number and item["Transaction_ID"] == txn_id:
-            updated = tx.dict()
-            updated["Transaction_ID"] = txn_id
-            updated["Customer_ID"] = item["Customer_ID"]
-            data[i] = updated
+        if item.get("Phone_Number") == phone_number and item.get("Transaction_ID") == txn_id:
+            updated_tx = tx.dict()
+            updated_tx["Transaction_ID"] = txn_id  # Keep same
+            updated_tx["Customer_ID"] = item["Customer_ID"]  # Keep same
+
+            data[i] = updated_tx
             save_data(data)
-            return updated
+            return updated_tx
+
     raise HTTPException(status_code=404, detail="Transaction not found.")
 
-# ----- Delete Transaction -----
+
+
+# ✅ Delete a transaction
 @app.delete("/delete_transaction/{phone_number}/{txn_id}")
 def delete_transaction(phone_number: str, txn_id: str):
     data = load_data()
-    new_data = [t for t in data if not (t["Phone_Number"] == phone_number and t["Transaction_ID"] == txn_id)]
-    if len(new_data) == len(data):
+    transaction_found = False
+
+    # Filter out the transaction to be deleted
+    new_data = []
+    for txn in data:
+        if txn.get("Phone_Number") == phone_number and txn.get("Transaction_ID") == txn_id:
+            transaction_found = True
+            continue
+        new_data.append(txn)
+
+    if not transaction_found:
         raise HTTPException(status_code=404, detail="Transaction not found.")
+
     save_data(new_data)
     return {"message": f"Transaction {txn_id} deleted successfully."}
