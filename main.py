@@ -5,7 +5,7 @@ import json
 import os
 
 app = FastAPI()
-DATA_FILE = "transaction.py"
+DATA_FILE = "transactions.json"
 
 # ----- Pydantic model -----
 class TransactionIn(BaseModel):
