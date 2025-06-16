@@ -103,19 +103,43 @@ def add_transaction(tx: TransactionIn):
     return tx_data
 
 # ✅ Get all transactions by phone number
-@app.get("/transactions/{phone_number}", response_model=List[TransactionOut])
-def get_transactions(phone_number: str):
+from fastapi import Query
+
+@app.get("/transactions/search", response_model=List[TransactionOut])
+def search_transactions(
+    phone_number: str = Query(None),
+    transaction_type: str = Query(None),
+    category: str = Query(None),
+    merchant: str = Query(None),
+    mode: str = Query(None),
+    location: str = Query(None)
+):
     try:
         data = load_data()
-        print("🔍 Loaded:", len(data), "Searching for:", phone_number)
+        print(f"🔍 Searching by phone: {phone_number}, type: {transaction_type}, category: {category}, merchant: {merchant}, mode: {mode}, location: {location}")
 
-        txns = [t for t in data if t.get("Phone_Number") == phone_number]
-        print("✅ Found:", len(txns))
+        filtered = []
 
-        if not txns:
-            raise HTTPException(status_code=404, detail="No transactions found.")
+        for txn in data:
+            if phone_number and txn.get("Phone_Number") != phone_number:
+                continue
+            if transaction_type and txn.get("Transaction_Type") != transaction_type:
+                continue
+            if category and category.lower() not in txn.get("Category", "").lower():
+                continue
+            if merchant and merchant.lower() not in txn.get("Merchant_or_Payee", "").lower():
+                continue
+            if mode and mode.lower() != txn.get("Mode", "").lower():
+                continue
+            if location and location.lower() not in txn.get("Location", "").lower():
+                continue
 
-        return txns
+            filtered.append(txn)
+
+        if not filtered:
+            raise HTTPException(status_code=404, detail="No transactions match the criteria.")
+
+        return filtered
 
     except Exception as e:
         print("❌ Internal Error:", str(e))
