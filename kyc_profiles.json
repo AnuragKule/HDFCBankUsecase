@@ -1,0 +1,62 @@
+[
+  {
+    "PREFIX": "MISS",
+    "FNAME": "MANASI",
+    "LNAME": "KABADE",
+    "FULLNAME": "MISS MANASI KABADE",
+    "GENDER": "Female",
+    "DOB": "08-08-2001",
+    "PAN": "LJHPK5325F",
+    "Address": "ICHALKARANJI, MAHARASHTRA INDIA 443202",
+    "PERM_PIN": "416115",
+    "MOB_CODE": "91",
+    "MOB_NUM": "7758014123",
+    "EMAIL_ID": "MANASIKABADE08@GMAIL.COM",
+    "KYC_ID": "KYC0003"
+  },
+  {
+    "PREFIX": "MISS",
+    "FNAME": "PALLAVI",
+    "LNAME": "WANKHEDE",
+    "FULLNAME": "MISS PALLAVI WANKHEDE",
+    "GENDER": "Female",
+    "DOB": "04-12-2001",
+    "PAN": "AHKPW4768N",
+    "Address": "JALNA MAHARASHTRA INDIA 443202",
+    "PERM_PIN": "431203",
+    "MOB_CODE": "91",
+    "MOB_NUM": "9657885738",
+    "EMAIL_ID": "PALLAVIWANKHEDE@GMAIL.COM",
+    "KYC_ID": "KYC0004"
+  },
+  {
+    "PREFIX": "MR",
+    "FNAME": "SAEED",
+    "LNAME": "SAIK",
+    "FULLNAME": "MR SAEED SAIK",
+    "GENDER": "M",
+    "DOB": "16-01-2001",
+    "PAN": "OOHPS1892P",
+    "Address": "AHEMAD NAGAR, MAHARASHTRA INDIA 443202",
+    "PERM_PIN": "414001",
+    "MOB_CODE": "91",
+    "MOB_NUM": "7517027418",
+    "EMAIL_ID": "SAEED1234.COC@GMAIL.COM",
+    "KYC_ID": "KYC0005"
+  },
+  {
+    "PREFIX": "MR",
+    "FNAME": "ANURAGG",
+    "LNAME": "KULE",
+    "FULLNAME": "MR ANURAGG KULE",
+    "GENDER": "M",
+    "DOB": "25-09-2001",
+    "PAN": "JEQPK4679C",
+    "Address": "BULDHANA, MAHARASHTRA INDIA 443202",
+    "PERM_PIN": "443202",
+    "MOB_CODE": "91",
+    "MOB_NUM": "9373505790",
+    "EMAIL_ID": "ANURAGKULE225@GMAIL.COM",
+    "KYC_ID": "KYC0006"
+  }
+]
